@@ -6271,7 +6271,8 @@ export const SettingsScreen = {
                 ? "Infuse"
                 : id === "vlc"
                   ? "VLC"
-                  : t("common.disabled", {}, "Disabled")
+                  : id === "iina" ? "IINA"
+                    : t("common.disabled", {}, "Disabled")
         }));
         this.openOptionDialog({
           title: "Play with external player",
