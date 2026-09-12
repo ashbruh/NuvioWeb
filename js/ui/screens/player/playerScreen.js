@@ -4578,11 +4578,11 @@ export const PlayerScreen = {
       actionsClassName: "desktop-external-player-actions",
       buttons: [
         ...getManualBrowserExternalPlayerOptions().map((player) => ({
-          label: player === "lenna" ? "Lenna" : player === "infuse" ? "Infuse" : "VLC",
+          label: player === "lenna" ? "Lenna" : player === "infuse" ? "Infuse" : player === "iina" ? "IINA" : "VLC",
           className: "desktop-external-player-choice",
           content: () => {
             const copy = document.createElement("span");
-            const playerName = player === "lenna" ? "Lenna" : player === "infuse" ? "Infuse" : "VLC";
+            const playerName = player === "lenna" ? "Lenna" : player === "infuse" ? "Infuse" : player === "iina" ? "IINA" : "VLC";
             copy.className = "desktop-external-player-choice-copy";
             copy.innerHTML = `<strong>${playerName}</strong><small>Open this stream in ${playerName}</small>`;
             return copy;
