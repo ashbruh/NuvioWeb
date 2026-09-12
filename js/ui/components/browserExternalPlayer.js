@@ -2,7 +2,8 @@ const EXTERNAL_PLAYER_IDS = Object.freeze({
   DISABLED: "disabled",
   LENNA: "lenna",
   INFUSE: "infuse",
-  VLC: "vlc"
+  VLC: "vlc",
+  IINA: "iina"
 });
 
 const IOS_APP_STORE_URLS = Object.freeze({
@@ -12,6 +13,7 @@ const IOS_APP_STORE_URLS = Object.freeze({
 });
 
 const ANDROID_VLC_STORE_URL = "https://play.google.com/store/apps/details?id=org.videolan.vlc";
+const IINA_DOWNLOAD_URL = "https://iina.io/";
 
 function runtimeUserAgent(runtime = globalThis) {
   return String(runtime?.navigator?.userAgent || "");
@@ -25,6 +27,7 @@ export function getBrowserExternalPlayerPlatform(runtime = globalThis) {
   if (/iphone|ipad|ipod/i.test(userAgent) || (platform === "MacIntel" && maxTouchPoints > 1)) {
     return "ios";
   }
+  if (platform === "MacIntel" && maxTouchPoints <= 1) return "mac";
   return "other";
 }
 
@@ -47,6 +50,13 @@ export function getBrowserExternalPlayerOptions(runtime = globalThis) {
   }
   if (platform === "android") {
     return [EXTERNAL_PLAYER_IDS.DISABLED, EXTERNAL_PLAYER_IDS.VLC];
+  }
+  if (platform === "mac") {
+    return [
+      EXTERNAL_PLAYER_IDS.DISABLED, 
+      EXTERNAL_PLAYER_IDS.IINA, 
+      EXTERNAL_PLAYER_IDS.INFUSE
+    ];
   }
   return [EXTERNAL_PLAYER_IDS.DISABLED];
 }
@@ -89,6 +99,13 @@ export function buildAndroidVlcLaunchUrl({ mediaUrl } = {}) {
   return `intent://${path}#Intent;scheme=${parsed.protocol.slice(0, -1)};package=org.videolan.vlc;action=android.intent.action.VIEW;S.browser_fallback_url=${encodeURIComponent(ANDROID_VLC_STORE_URL)};end`;
 }
 
+export function buildIinaLaunchUrl({ mediaUrl } = {}) {
+  if (!isTransferableExternalMediaUrl(mediaUrl)) return "";
+  // Single query param only — IINA's scheme parser has known trouble with
+  // extra params tacked onto weblink (see iina/iina#3922).
+  return `iina://weblink?url=${encodeURIComponent(mediaUrl)}`;
+}
+
 export function buildBrowserExternalPlayerLaunch({ player, platform, mediaUrl, title, subtitleUrl } = {}) {
   const selectedPlayer = normalizeBrowserExternalPlayer(player);
   if (!isTransferableExternalMediaUrl(mediaUrl) || selectedPlayer === EXTERNAL_PLAYER_IDS.DISABLED) {
@@ -106,6 +123,12 @@ export function buildBrowserExternalPlayerLaunch({ player, platform, mediaUrl, t
   if (platform === "android" && selectedPlayer === EXTERNAL_PLAYER_IDS.VLC) {
     return { href: buildAndroidVlcLaunchUrl({ mediaUrl }), storeUrl: ANDROID_VLC_STORE_URL };
   }
+  if (platform === "mac" && selectedPlayer === EXTERNAL_PLAYER_IDS.IINA) {
+    return { href: buildIinaLaunchUrl({ mediaUrl }), storeUrl: IINA_DOWNLOAD_URL };
+  }
+  if (platform === "mac" && selectedPlayer === EXTERNAL_PLAYER_IDS.INFUSE) {
+    return { href: buildInfuseLaunchUrl({ mediaUrl, title, subtitleUrl }), storeUrl: IOS_APP_STORE_URLS.infuse };
+  }
   return null;
 }
 
@@ -122,6 +145,8 @@ export function getBrowserExternalPlayerStoreUrl({ player, platform } = {}) {
   const selectedPlayer = normalizeBrowserExternalPlayer(player);
   if (platform === "ios") return IOS_APP_STORE_URLS[selectedPlayer] || "";
   if (platform === "android" && selectedPlayer === EXTERNAL_PLAYER_IDS.VLC) return ANDROID_VLC_STORE_URL;
+  if (platform === "mac" && selectedPlayer === EXTERNAL_PLAYER_IDS.IINA) return IINA_DOWNLOAD_URL;
+  if (platform === "mac" && selectedPlayer === EXTERNAL_PLAYER_IDS.INFUSE) return IOS_APP_STORE_URLS.infuse;
   return "";
 }
 
