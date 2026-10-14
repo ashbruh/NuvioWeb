@@ -56,7 +56,7 @@ jobs:
         id: frontend-meta
         uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
         with:
-          images: ghcr.io/alphasquare404/nuvioweb
+          images: ghcr.io/ashbruh/nuvioweb
           flavor: |
             latest=false
           tags: |
@@ -71,7 +71,7 @@ jobs:
         id: trakt-meta
         uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
         with:
-          images: ghcr.io/alphasquare404/nuvioweb-trakt-auth-bridge
+          images: ghcr.io/ashbruh/nuvioweb-trakt-auth-bridge
           flavor: |
             latest=false
           tags: |
@@ -86,7 +86,7 @@ jobs:
         id: debrid-meta
         uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
         with:
-          images: ghcr.io/alphasquare404/nuvioweb-debrid-api-bridge
+          images: ghcr.io/ashbruh/nuvioweb-debrid-api-bridge
           flavor: |
             latest=false
           tags: |
@@ -101,7 +101,7 @@ jobs:
         id: external-return-meta
         uses: docker/metadata-action@369eb591f429131d6889c46b94e711f089e6ca96 # v5.6.1
         with:
-          images: ghcr.io/alphasquare404/nuvioweb-external-return-bridge
+          images: ghcr.io/ashbruh/nuvioweb-external-return-bridge
           flavor: |
             latest=false
           tags: |
@@ -117,7 +117,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.frontend-meta.outputs.tags }}
           labels: ${{ steps.frontend-meta.outputs.labels }}
@@ -129,7 +129,7 @@ jobs:
         with:
           context: .
           file: ./services/trakt-auth-bridge/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.trakt-meta.outputs.tags }}
           labels: ${{ steps.trakt-meta.outputs.labels }}
@@ -141,7 +141,7 @@ jobs:
         with:
           context: .
           file: ./services/debrid-api-bridge/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.debrid-meta.outputs.tags }}
           labels: ${{ steps.debrid-meta.outputs.labels }}
@@ -153,7 +153,7 @@ jobs:
         with:
           context: .
           file: ./services/external-return-bridge/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.external-return-meta.outputs.tags }}
           labels: ${{ steps.external-return-meta.outputs.labels }}
